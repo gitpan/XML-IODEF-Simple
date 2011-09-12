@@ -1,0 +1,6 @@
+Revision history for Perl extension XML::IODEF::Simple.
+
+0.00_01  Tue Aug 30 18:29:50 2011
+	- original version; created by h2xs 1.23 with options
+		-ABXb 5.8.8 XML::IODEF::Simple
+
