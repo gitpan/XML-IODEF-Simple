@@ -4,19 +4,17 @@ use 5.008008;
 use strict;
 use warnings;
 
-our $VERSION = '0.00_01';
+our $VERSION = '0.00_02';
 $VERSION = eval $VERSION;  # see L<perlmodstyle>
 
 require XML::IODEF;
 use Module::Pluggable require => 1;
-
 
 # Preloaded methods go here.
 
 sub new {
     my ($class,$info) = @_;
     
-    my $address                     = $info->{'address'};
     my $description                 = lc($info->{'description'});
     my $confidence                  = $info->{'confidence'};
     my $severity                    = $info->{'severity'};
@@ -25,8 +23,6 @@ sub new {
     my $relatedid                   = $info->{'relatedid'};
     my $alternativeid               = $info->{'alternativeid'};
     my $alternativeid_restriction   = $info->{'alternativeid_restriction'} || 'private';
-    my $protocol                    = $info->{'protocol'};
-    my $portlist                    = $info->{'portlist'};
     my $purpose                     = $info->{'purpose'} || 'mitigation';
     my $guid                        = $info->{'guid'};
 
@@ -76,45 +72,45 @@ sub new {
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
-
 =head1 NAME
 
-XML::IODEF::Simple - Perl extension for blah blah blah
+XML::IODEF::Simple - Perl extension for easier IODEF message generation
 
 =head1 SYNOPSIS
 
   use XML::IODEF::Simple;
-  blah blah blah
+  my $report = XML::IODEF::Simple->new({
+        guid        => 'mygroup',
+        source      => 'example.com',
+        restriction => 'need-to-know',
+        description => 'spyeye',
+        impact      => 'botnet',
+        address     => '1.2.3.4',
+        protocol    => 'tcp',
+        portlist    => '8080',
+        contact     => {
+            name        => 'root',
+            email       => 'root@localhost',
+        },
+        purpose                     => 'mitigation',
+        confidence                  => '85',
+        alternativeid               => 'https://example.com/rt/Ticket/Display.html?id=1234',
+        alternativeid_restriction   => 'private',
+    });
+    my $xml = $report->out(); 
+    my $hash = $report->to_tree();
 
 =head1 DESCRIPTION
 
-Stub documentation for XML::IODEF::Simple, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
-
-=head2 EXPORT
-
-None by default.
-
-
+This module makes it a bit simpler to crank out XML+IODEF messages. It uses what it finds under XML/IODEF/Simple/Plugin/ to adapt "defaults" to the keypairs it takes in. To allow for other default settings / manipulations, create XML::IODEF::Simple::Plugin::MyPlugin and Module::Pluggable will pick it up on the fly. See XML::IODEF::Simple::Plugin::Ipv4 as an example.
 
 =head1 SEE ALSO
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
-
-If you have a mailing list set up for your module, mention it here.
-
-If you have a web site set up for your module, mention it here.
+XML::IODEF, http://code.google.com/p/collective-intelligence-framework/
 
 =head1 AUTHOR
 
-Wes Young, E<lt>wes@E<gt>
+Wes Young, E<lt>wes@barely3am.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

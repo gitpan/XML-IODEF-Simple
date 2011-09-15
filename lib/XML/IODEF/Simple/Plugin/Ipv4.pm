@@ -20,10 +20,6 @@ sub convert {
     $iodef->add('IncidentEventDataFlowSystemNodeAddresscategory',$cat);
     $iodef->add('IncidentEventDataFlowSystemNodeAddress',$info->{'address'});
 
-    unless($info->{'impact'} =~ / infrastructure/){
-        $info->{'impact'} .= ' infrastructure';
-    }
-
     return($iodef);
 }
 

@@ -1,11 +1,15 @@
 package XML::IODEF::Simple::Plugin::Domain;
 
+use Regexp::Common qw/URI/;
+
 sub prepare {
     my $class   = shift;
     my $info    = shift;
 
     my $address = $info->{'address'};
-    return(1) if($address && $address =~ /^[a-zA-Z0-9.-]+\.[a-z]{2,5}$/);
+    return if($address =~ /^$RE{'URI'}{'HTTP'}$/);
+    return if($address =~ /^$RE{'URI'}{'HTTP'}{-scheme => 'https'}$/);
+    return(1) if($address && $address =~ /^[a-zA-Z0-9.-_]+\.[a-z]{2,5}$/);
     return(0);
 }
 
@@ -35,11 +39,6 @@ sub convert {
     $iodef->add('IncidentEventDataFlowSystemAdditionalDatadtype','string');
     $iodef->add('IncidentEventDataFlowSystemAdditionalDatameaning','type');
     $iodef->add('IncidentEventDataFlowSystemAdditionalData',$info->{'type'} || 'A');
-
-    my $impact = $info->{'impact'};
-    return($iodef) if($impact =~ /domain/);
-    $info->{'impact'} .= ' domain';
-
 
     return($iodef);
 }

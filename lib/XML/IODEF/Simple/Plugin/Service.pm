@@ -16,8 +16,12 @@ sub convert {
 
     $info->{'protocol'} = normalize($info->{'protocol'}) if($info->{'protocol'});
 
-    $iodef->add('IncidentEventDataFlowSystemServicePortlist',$info->{'portlist'}) if($info->{'portlist'});
-    $iodef->add('IncidentEventDataFlowSystemServiceip_protocol',$info->{'protocol'}) if($info->{'protocol'});
+    unless($iodef->get('IncidentEventDataFlowSystemServicePortlist')){
+        $iodef->add('IncidentEventDataFlowSystemServicePortlist',$info->{'portlist'}) if($info->{'portlist'});
+    }
+    unless($iodef->get('IncidentEventDataFlowSystemServiceip_protocol')){
+        $iodef->add('IncidentEventDataFlowSystemServiceip_protocol',$info->{'protocol'}) if($info->{'protocol'});
+    }
     return($iodef);
 }
 

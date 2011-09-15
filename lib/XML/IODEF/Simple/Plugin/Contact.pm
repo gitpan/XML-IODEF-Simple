@@ -19,8 +19,8 @@ sub convert {
 
     $iodef->add('IncidentContacttype',$type);
     $iodef->add('IncidentContactrole',$role);
+    $iodef->add('IncidentContactEmail',$c->{'email'}) if($c->{'email'});
     $iodef->add('IncidentContactContactName',$c->{'name'}) if($c->{'name'});
-    $iodef->add('IncidentContactContactEmail',$c->{'email'}) if($c->{'email'});
 
     return($iodef);
 }

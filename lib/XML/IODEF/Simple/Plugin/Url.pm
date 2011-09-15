@@ -11,7 +11,7 @@ sub prepare {
 
     my $address = $info->{'address'};
     return unless($address);
-    return unless($address =~ /^$RE{'URI'}/);
+    return unless($address =~ /^$RE{'URI'}$/ || $address =~ /^$RE{'URI'}{'HTTP'}{-scheme => 'https'}$/);
     $address = lc($address);
     my $safe = uri_escape($address,'\x00-\x1f\x7f-\xff');
     $address = $safe;
@@ -39,9 +39,25 @@ sub convert {
     $iodef->add('IncidentEventDataFlowSystemAdditionalDatadtype','string');
     $iodef->add('IncidentEventDataFlowSystemAdditionalDatameaning','sha1');
     $iodef->add('IncidentEventDataFlowSystemAdditionalData',$info->{'sha1'});
+    
+    my $domain;
 
-    unless($info->{'impact'} =~ / url/){
-        $info->{'impact'} .= ' url';
+    my $port = 80;
+    if($address =~ /^(https?\:\/\/)?([A-Za-z0-9-\.]+\.[a-z]{2,5})(:\d+)\/?/){
+        $domain = $2;
+        $port = $3;
+    } elsif($address =~ /^(https?\:\/\/)?($RE{'net'}{'IPv4'})(:\d+)?\//) {
+        $domain = $2;
+        $port = $3;
+        $port = 443 unless($port);
+    }
+    $port =~ s/^://;
+    warn $port;
+    unless($iodef->get('IncidentEventDataFlowSystemServicePortlist')){
+        $iodef->add('IncidentEventDataFlowSystemServicePortlist',$port);
+    }
+    unless($iodef->get('IncidentEventDataFlowSystemServiceip_protocol')){
+        $iodef->add('IncidentEventDataFlowSystemServiceip_protocol',6);
     }
 
     return($iodef);
