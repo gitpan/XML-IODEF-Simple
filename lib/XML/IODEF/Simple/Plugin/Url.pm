@@ -13,11 +13,22 @@ sub prepare {
     return unless($address);
     return unless($address =~ /^$RE{'URI'}$/ || $address =~ /^$RE{'URI'}{'HTTP'}{-scheme => 'https'}$/);
     $address = lc($address);
+    $address =~ s/\/$//;
     my $safe = uri_escape($address,'\x00-\x1f\x7f-\xff');
     $address = $safe;
     $info->{'address'} = $safe;
     $info->{'md5'} = md5_hex($safe) unless($info->{'md5'});
     $info->{'sha1'} = sha1_hex($safe) unless($info->{'sha1'});
+    unless($info->{'impact'} =~ / url$/){
+        $info->{'impact'} = $info->{'impact'}.' url';
+    }
+    return(1);
+}
+
+sub isUrl {
+    my $address = shift;
+    return unless($address);
+    return unless($address =~ /^$RE{'URI'}$/ || $address =~ /^$RE{'URI'}{'HTTP'}{-scheme => 'https'}$/);
     return(1);
 }
 
@@ -52,7 +63,6 @@ sub convert {
         $port = 443 unless($port);
     }
     $port =~ s/^://;
-    warn $port;
     unless($iodef->get('IncidentEventDataFlowSystemServicePortlist')){
         $iodef->add('IncidentEventDataFlowSystemServicePortlist',$port);
     }
