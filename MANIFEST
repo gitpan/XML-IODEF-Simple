@@ -18,11 +18,11 @@ lib/XML/IODEF/Simple/Plugin/Email.pm
 lib/XML/IODEF/Simple/Plugin/Fastflux.pm
 lib/XML/IODEF/Simple/Plugin/Groups.pm
 lib/XML/IODEF/Simple/Plugin/Hijacked.pm
+lib/XML/IODEF/Simple/Plugin/History.pm
 lib/XML/IODEF/Simple/Plugin/Ipv4.pm
 lib/XML/IODEF/Simple/Plugin/Malware.pm
 lib/XML/IODEF/Simple/Plugin/Nameserver.pm
 lib/XML/IODEF/Simple/Plugin/Phishing.pm
-lib/XML/IODEF/Simple/Plugin/RI_RESTRICTION.pm
 lib/XML/IODEF/Simple/Plugin/Scanner.pm
 lib/XML/IODEF/Simple/Plugin/Searchhash.pm
 lib/XML/IODEF/Simple/Plugin/Service.pm

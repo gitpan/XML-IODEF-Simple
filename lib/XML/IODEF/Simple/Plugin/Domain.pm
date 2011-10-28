@@ -7,9 +7,10 @@ sub prepare {
     my $info    = shift;
 
     my $address = $info->{'address'};
+    return unless($address);
     return if($address =~ /^$RE{'URI'}{'HTTP'}$/);
     return if($address =~ /^$RE{'URI'}{'HTTP'}{-scheme => 'https'}$/);
-    return(1) if($address && $address =~ /^[a-zA-Z0-9.-_]+\.[a-z]{2,5}$/);
+    return(1) if($address && $address =~ /^[a-zA-Z0-9.\-_]+\.[a-z]{2,5}$/);
     return(0);
 }
 

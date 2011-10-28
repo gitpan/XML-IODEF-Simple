@@ -4,7 +4,7 @@ use 5.008008;
 use strict;
 use warnings;
 
-our $VERSION = '0.00_03';
+our $VERSION = '0.01';
 $VERSION = eval $VERSION;  # see L<perlmodstyle>
 
 require XML::IODEF;
@@ -18,12 +18,13 @@ sub new {
     my $description                 = lc($info->{'description'}) || 'unknown';
     my $confidence                  = $info->{'confidence'};
     my $severity                    = $info->{'severity'};
-    my $restriction                 = $info->{'restriction'} || 'private';
     my $source                      = $info->{'source'} || 'localhost';
     my $relatedid                   = $info->{'relatedid'};
     my $alternativeid               = $info->{'alternativeid'};
     my $alternativeid_restriction   = $info->{'alternativeid_restriction'} || 'private';
     my $purpose                     = $info->{'purpose'} || 'mitigation';
+    my $reporttime                  = $info->{'reporttime'};
+    my $lang                        = $info->{'lang'} || $info->{'language'} || 'EN';
 
     my $dt = $info->{'detecttime'};
     # default it to the hour
@@ -32,18 +33,46 @@ sub new {
         $dt = DateTime->from_epoch(epoch => time());
         $dt = $dt->ymd().'T'.$dt->hour().':00:00Z';
     }
+    if($dt =~ /^(\d{4})(\d{2})(\d{2})$/){
+        $dt = $1.'-'.$2.'-'.$3.'T00:00:00Z';
+    }
     $info->{'detecttime'} = $dt;
 
+    unless($reporttime){
+        require DateTime;
+        $reporttime = DateTime->from_epoch(epoch => time());
+        $reporttime = $reporttime->ymd().'T00:00:00Z';
+    }
+    if($reporttime =~ /^(\d{4})(\d{2})(\d{2})$/){
+        $reporttime = $1.'-'.$2.'-'.$3.'T00:00:00Z';
+    }
+
     my $iodef = XML::IODEF->new();
+    $iodef->add('Incidentlang',$lang);
     $iodef->add('Incidentpurpose',$purpose);
-    $iodef->add('IncidentIncidentIDname',$source) if($source);
+    foreach($class->plugins()){
+        if($_->prepare($info)){
+            $iodef = $_->convert($info,$iodef);
+        }
+    }
+
+    if($info->{'IncidentID'}){
+        my $xid = $info->{'IncidentID'};
+        $iodef->add('IncidentIncidentIDrestriction',$xid->{'restriction'}) if($xid->{'restriction'});
+        $iodef->add('IncidentIncidentIDname',$xid->{'name'}) if($xid->{'name'});
+        $iodef->add('IncidentIncidentIDinstance',$xid->{'instance'}) if($xid->{'instance'});
+        $iodef->add('IncidentIncidentID',$xid->{'content'}) if($xid->{'content'});
+    } else {
+        $iodef->add('IncidentIncidentIDname',$source) if($source);
+    }
+    $iodef->add('IncidentReportTime',$reporttime) if($reporttime);
     $iodef->add('IncidentDetectTime',$dt) if($dt);
     $iodef->add('IncidentRelatedActivityIncidentID',$relatedid) if($relatedid);
     if($alternativeid){
         $iodef->add('IncidentAlternativeIDIncidentID',$alternativeid);
         $iodef->add('IncidentAlternativeIDIncidentIDrestriction',$alternativeid_restriction);
     }
-    $iodef->add('Incidentrestriction',$restriction);
+    $iodef->add('Incidentrestriction',$info->{'restriction'} || 'private');
     $iodef->add('IncidentDescription',$description) if($description);
     if($confidence){
         $iodef->add('IncidentAssessmentConfidencerating','numeric');
@@ -53,11 +82,6 @@ sub new {
         $iodef->add('IncidentAssessmentImpactseverity',$severity);
     }
 
-    foreach($class->plugins()){
-        if($_->prepare($info)){
-            $iodef = $_->convert($info,$iodef);
-        }        
-    }
     my $impact = $info->{'impact'};
     $iodef->add('IncidentAssessmentImpact',$impact) if($impact);
     return $iodef;
