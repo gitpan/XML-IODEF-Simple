@@ -4,7 +4,7 @@ use 5.008008;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 $VERSION = eval $VERSION;  # see L<perlmodstyle>
 
 require XML::IODEF;
@@ -78,12 +78,14 @@ sub new {
         $iodef->add('IncidentAssessmentConfidencerating','numeric');
         $iodef->add('IncidentAssessmentConfidence',$confidence);
     }
-    if($severity && $severity =~ /(low|medium|high)/){
+    my $impact = $info->{'impact'};
+    $iodef->add('IncidentAssessmentImpact',$impact) if($impact && !$iodef->get('IncidentAssessmentImpact'));
+
+    if(!$iodef->get('IncidentAssessmentImpactseverity') && $severity && $severity =~ /(low|medium|high)/){
+        warn 'adding sev';
         $iodef->add('IncidentAssessmentImpactseverity',$severity);
     }
 
-    my $impact = $info->{'impact'};
-    $iodef->add('IncidentAssessmentImpact',$impact) if($impact);
     return $iodef;
 }
 

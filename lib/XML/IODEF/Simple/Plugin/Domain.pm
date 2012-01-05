@@ -10,8 +10,11 @@ sub prepare {
     return unless($address);
     return if($address =~ /^$RE{'URI'}{'HTTP'}$/);
     return if($address =~ /^$RE{'URI'}{'HTTP'}{-scheme => 'https'}$/);
-    return(1) if($address && $address =~ /^[a-zA-Z0-9.\-_]+\.[a-z]{2,5}$/);
-    return(0);
+    return(0) unless($address && $address =~ /^[a-zA-Z0-9.\-_]+\.[a-z]{2,5}$/);
+    unless($info->{'impact'} =~ /domain/){
+        $info->{'impact'} .= ' domain';
+    }
+    return(1);
 }
 
 sub convert {

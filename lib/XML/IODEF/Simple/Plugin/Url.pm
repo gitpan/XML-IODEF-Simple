@@ -11,7 +11,7 @@ sub prepare {
 
     my $address = $info->{'address'};
     return unless($address);
-    return unless($address =~ /^$RE{'URI'}$/ || $address =~ /^$RE{'URI'}{'HTTP'}{-scheme => 'https'}$/);
+    return unless($address =~ /^$RE{'URI'}/ || $address =~ /^$RE{'URI'}{'HTTP'}{-scheme => 'https'}/);
     $address = lc($address);
     $address =~ s/\/$//;
     my $safe = uri_escape($address,'\x00-\x1f\x7f-\xff');
@@ -63,11 +63,15 @@ sub convert {
         $port = 443 unless($port);
     }
     $port =~ s/^://;
-    unless($iodef->get('IncidentEventDataFlowSystemServicePortlist')){
-        $iodef->add('IncidentEventDataFlowSystemServicePortlist',$port);
+    unless($info->{'portlist'}){
+        unless($iodef->get('IncidentEventDataFlowSystemServicePortlist')){
+            $iodef->add('IncidentEventDataFlowSystemServicePortlist',$port);
+        }
     }
-    unless($iodef->get('IncidentEventDataFlowSystemServiceip_protocol')){
+    unless($info->{'protocol'}){
+        unless($iodef->get('IncidentEventDataFlowSystemServiceip_protocol')){
         $iodef->add('IncidentEventDataFlowSystemServiceip_protocol',6);
+        }
     }
 
     return($iodef);

@@ -1,11 +1,11 @@
-package XML::IODEF::Simple::Plugin::Phishing;
+package XML::IODEF::Simple::Plugin::Suspicious;
 
 sub prepare {
     my $class   = shift;
     my $info    = shift;
 
     return(0) unless($info->{'impact'});
-    return(0) unless($info->{'impact'} =~ /phish/);
+    return(0) unless($info->{'impact'} =~ /suspicious/);
     return(1);
 }
 
